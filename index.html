@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ระบบลงทะเบียนกิจกรรมนักศึกษา</title>
+  <meta name="description" content="ระบบลงทะเบียนกิจกรรมนักศึกษา">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div>
+        <div class="eyebrow">STUDENT ACTIVITY</div>
+        <h1>ระบบลงทะเบียนกิจกรรมนักศึกษา</h1>
+        <p>เลือกกิจกรรมที่เปิดรับและตรวจสอบจำนวนที่นั่งคงเหลือได้ทันที</p>
+      </div>
+      <button class="btn btn-light" id="openCancelBtn">ยกเลิกการลงทะเบียน</button>
+    </div>
+  </header>
+
+  <main class="container main">
+    <section class="toolbar">
+      <div>
+        <h2>กิจกรรมที่เปิดรับ</h2>
+        <p id="summaryText">กำลังโหลดข้อมูล...</p>
+      </div>
+      <button class="btn btn-outline" id="refreshBtn">รีเฟรชข้อมูล</button>
+    </section>
+
+    <div id="alertBox" class="alert hidden"></div>
+    <section id="activityGrid" class="activity-grid"></section>
+
+    <section id="emptyState" class="empty hidden">
+      <div class="empty-icon">📅</div>
+      <h3>ยังไม่มีกิจกรรมที่เปิดรับ</h3>
+      <p>โปรดกลับมาตรวจสอบอีกครั้งภายหลัง</p>
+    </section>
+  </main>
+
+  <!-- Register Modal -->
+  <div class="modal hidden" id="registerModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close="registerModal"></div>
+    <div class="modal-card">
+      <button class="modal-close" data-close="registerModal" aria-label="ปิด">×</button>
+      <h2>ลงทะเบียนกิจกรรม</h2>
+      <div class="selected-activity" id="selectedActivity"></div>
+
+      <form id="registerForm">
+        <input type="hidden" id="activityId" name="activityId">
+
+        <label>
+          รหัสนักศึกษา
+          <input id="studentId" name="studentId" inputmode="numeric" maxlength="15"
+                 placeholder="กรอกรหัสนักศึกษา" required>
+        </label>
+
+        <label>
+          เบอร์โทรศัพท์
+          <input id="phone" name="phone" inputmode="tel" maxlength="10"
+                 placeholder="เช่น 0812345678" required>
+        </label>
+
+        <label id="slotWrap" class="hidden">
+          ช่วงเวลาเข้าร่วม
+          <select id="slotId" name="slotId"></select>
+        </label>
+
+        <div class="form-note">
+          1 รหัสนักศึกษาลงทะเบียนได้ 1 ครั้งต่อกิจกรรม
+        </div>
+
+        <button class="btn btn-primary btn-full" type="submit" id="submitRegisterBtn">
+          ยืนยันการลงทะเบียน
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Cancel Modal -->
+  <div class="modal hidden" id="cancelModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close="cancelModal"></div>
+    <div class="modal-card">
+      <button class="modal-close" data-close="cancelModal" aria-label="ปิด">×</button>
+      <h2>ยกเลิกการลงทะเบียน</h2>
+      <p class="muted">กรอกข้อมูลเดียวกับที่ใช้ลงทะเบียน ระบบจะคืนจำนวนที่ว่างให้อัตโนมัติ</p>
+
+      <form id="cancelForm">
+        <label>
+          กิจกรรม
+          <select id="cancelActivityId" name="activityId" required></select>
+        </label>
+
+        <label>
+          รหัสนักศึกษา
+          <input id="cancelStudentId" name="studentId" inputmode="numeric"
+                 placeholder="กรอกรหัสนักศึกษา" required>
+        </label>
+
+        <label>
+          เบอร์โทรศัพท์
+          <input id="cancelPhone" name="phone" inputmode="tel" maxlength="10"
+                 placeholder="เบอร์โทรศัพท์ที่ใช้ลงทะเบียน" required>
+        </label>
+
+        <button class="btn btn-danger btn-full" type="submit" id="submitCancelBtn">
+          ยืนยันการยกเลิก
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <footer>
+    <div class="container">ระบบลงทะเบียนกิจกรรมนักศึกษา</div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

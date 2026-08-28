@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin | ระบบลงทะเบียนกิจกรรม</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div>
+        <div class="eyebrow">ADMINISTRATION</div>
+        <h1>จัดการกิจกรรม</h1>
+        <p>สร้างกิจกรรม กำหนดจำนวนรับ และตรวจสอบยอดลงทะเบียน</p>
+      </div>
+      <div class="header-actions">
+        <a class="btn btn-light" href="index.html">หน้าลงทะเบียน</a>
+        <button class="btn btn-light hidden" id="logoutBtn">ออกจากระบบ</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main">
+    <div id="alertBox" class="alert hidden"></div>
+
+    <section id="loginSection" class="admin-login">
+      <h2>เข้าสู่ระบบ Admin</h2>
+      <p class="muted">กรอก Admin Key ที่ตั้งไว้ใน Apps Script Script Properties</p>
+      <form id="loginForm">
+        <label>Admin Key
+          <input id="adminKey" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="btn btn-primary btn-full" type="submit">เข้าสู่ระบบ</button>
+      </form>
+    </section>
+
+    <section id="adminSection" class="hidden">
+      <div class="admin-topbar overview-toolbar">
+        <div>
+          <h2 style="margin-bottom:2px">ภาพรวมระบบ</h2>
+          <p class="muted" id="overviewDescription" style="margin-top:0">แสดงภาพรวมกิจกรรมทั้งหมดในระบบ</p>
+        </div>
+        <div class="overview-controls">
+          <label class="overview-select-label">
+            เลือกกิจกรรม
+            <select id="overviewActivitySelect">
+              <option value="">-- กิจกรรมทั้งหมด --</option>
+            </select>
+          </label>
+          <div class="admin-actions">
+            <button class="btn btn-outline" id="exportAllBtn">ดาวน์โหลดรายงานทั้งหมด</button>
+            <button class="btn btn-outline" id="refreshAdminBtn">รีเฟรช</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-grid kpi-grid-3">
+        <div class="kpi"><span id="kpiLabel1">กิจกรรมทั้งหมด</span><strong id="kpiValue1">0</strong></div>
+        <div class="kpi"><span id="kpiLabel2">เปิดรับอยู่</span><strong id="kpiValue2">0</strong></div>
+        <div class="kpi"><span id="kpiLabel3">ปิดรับแล้ว</span><strong id="kpiValue3">0</strong></div>
+      </div>
+
+      <div class="admin-shell">
+        <aside class="admin-panel">
+          <h2 id="formTitle">สร้างกิจกรรมใหม่</h2>
+          <form id="activityForm">
+            <input type="hidden" id="editActivityId">
+
+            <label>รหัสกิจกรรม
+              <input id="activityCode" placeholder="เช่น ACT002" required>
+            </label>
+
+            <label>ชื่อกิจกรรม
+              <input id="activityName" required>
+            </label>
+
+            <label>วันที่ทำกิจกรรม
+              <input id="activityDate" type="date" required>
+            </label>
+
+            <label>รายละเอียด
+              <textarea id="activityDetail" rows="4" style="width:100%;border:1px solid #d9dde1;border-radius:10px;padding:11px 12px"></textarea>
+            </label>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <label>เวลาเริ่ม
+                <input id="startTime" type="time" required>
+              </label>
+              <label>เวลาสิ้นสุด
+                <input id="endTime" type="time" required>
+              </label>
+            </div>
+
+            <label>จำนวนที่เปิดรับ
+              <input id="capacity" type="number" min="1" step="1" required>
+            </label>
+
+            <fieldset class="benefit-fieldset">
+              <legend>สิ่งที่ต้องการจากกิจกรรม <span class="required">*</span></legend>
+              <div class="muted">เลือกได้มากกว่า 1 อย่าง และต้องเลือกอย่างน้อย 1 อย่าง นักศึกษาจะเลือก 1 อย่างตอนลงทะเบียน</div>
+
+              <label class="check-row">
+                <input type="checkbox" name="benefit" value="Passcode (สำหรับปี 2 - 4)">
+                <span>Passcode (สำหรับปี 2 - 4)</span>
+              </label>
+              <label class="check-row">
+                <input type="checkbox" name="benefit" value="Check - in (สำหรับปี 1)">
+                <span>Check - in (สำหรับปี 1)</span>
+              </label>
+              <label class="check-row benefit-with-hours">
+                <input type="checkbox" name="benefit" value="ชั่วโมงทุนเครือข่าย">
+                <span>ชั่วโมงทุนเครือข่าย</span>
+                <input class="benefit-hours" data-benefit="ชั่วโมงทุนเครือข่าย" type="number" min="0.5" step="0.5" placeholder="ชม." disabled>
+              </label>
+              <label class="check-row benefit-with-hours">
+                <input type="checkbox" name="benefit" value="ชั่วโมงทุนคนละครึ่ง">
+                <span>ชั่วโมงทุนคนละครึ่ง</span>
+                <input class="benefit-hours" data-benefit="ชั่วโมงทุนคนละครึ่ง" type="number" min="0.5" step="0.5" placeholder="ชม." disabled>
+              </label>
+              <label class="check-row">
+                <input type="checkbox" name="benefit" value="ชั่วโมง กยศ. (นักศึกษาต้องนำใบชั่วโมงมาให้ลงนามในวันกิจกรรมหรือภายหลังได้)">
+                <span>ชั่วโมง กยศ. (นักศึกษาต้องนำใบชั่วโมงมาให้ลงนามในวันกิจกรรมหรือภายหลังได้)</span>
+              </label>
+            </fieldset>
+
+            <label>สถานะ
+              <select id="status" required>
+                <option value="เปิดรับ">เปิดรับ</option>
+                <option value="ปิดรับ">ปิดรับ</option>
+              </select>
+            </label>
+
+            <div style="margin:18px 0 8px">
+              <strong>ช่วงเวลาเข้าร่วม</strong>
+              <div class="muted">ไม่บังคับ หากไม่เพิ่ม นักศึกษาจะลงทะเบียนกิจกรรมโดยไม่เลือกช่วงเวลา</div>
+            </div>
+            <div id="slotsContainer"></div>
+            <button class="btn btn-outline btn-full" type="button" id="addSlotBtn">+ เพิ่มช่วงเวลา</button>
+
+            <div class="admin-actions" style="margin-top:16px">
+              <button class="btn btn-primary" type="submit" id="saveActivityBtn">บันทึกกิจกรรม</button>
+              <button class="btn btn-outline hidden" type="button" id="cancelEditBtn">ยกเลิกการแก้ไข</button>
+            </div>
+          </form>
+        </aside>
+
+        <section class="admin-table-wrap">
+          <h2>รายการกิจกรรม</h2>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>กิจกรรม</th>
+                <th>วันที่</th>
+                <th>สิทธิประโยชน์</th>
+                <th>รับ</th>
+                <th>ลงแล้ว</th>
+                <th>คงเหลือ</th>
+                <th>สถานะ</th>
+                <th>สรุปสิทธิ์ที่เลือก</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
